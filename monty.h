@@ -1,74 +1,78 @@
 #ifndef MONTY_H
 #define MONTY_H
-
 #include <stdio.h>
 #include <stdlib.h>
-
-/* Structures */
-
+#include <sys/types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <ctype.h>
 /**
- * struct stack_s - Stack structure
- * @n: Integer value
- * @next: Pointer to next element
+ * struct stack_s - doubly linked list rep of a stack (or queue)
+ * @n: integer
+ * @prev: points to the prev element of the stack (or queue)
+ * @next: points to next element of the stack (or queue)
  *
- * Description: Structure representing a stack element
+ * Description: doubly linked list node structure
+ * for stack, queues, LIFO, FIFO ALXSE project
  */
 typedef struct stack_s
 {
 	int n;
+	struct stack_s *prev;
 	struct stack_s *next;
 } stack_t;
-
-/* Global Variables */
-
-extern stack_t *top;
-extern int format;
-
-/* Function Prototypes */
-
-/* Monty Interpreter */
-void process_file(const char *filename);
-void process_instruction(char *opcode, unsigned int line_number);
-void free_stack(void);
-
-/* Stack Operations */
-void push(int value);
-void pall(void);
-void pint(void);
-void pop(void);
-void swap(void);
-void add(void);
-void sub(void);
-void mul(void);
-void div_op(void);
-void mod(void);
-void pchar(void);
-void pstr(void);
-void rotl(void);
-void rotr(void);
-void stack(void);
-void queue(void);
-
-/* Utility Functions */
-int is_integer(const char *str);
-int is_valid_opcode(char *opcode);
-int atoi_error(const char *str);
-void error_usage_push(unsigned int line_number);
-void error_push(unsigned int line_number);
-void error_pint(unsigned int line_number);
-void error_pop(unsigned int line_number);
-void error_swap(unsigned int line_number);
-void error_add(unsigned int line_number);
-void error_sub(unsigned int line_number);
-void error_mul(unsigned int line_number);
-void error_div(unsigned int line_number);
-void error_mod(unsigned int line_number);
-void error_pchar(unsigned int line_number);
-void error_pstr(unsigned int line_number);
-void error_rotl(unsigned int line_number);
-void error_rotr(unsigned int line_number);
-void error_stack(unsigned int line_number);
-void error_queue(unsigned int line_number);
-void error_malloc(void);
-
-#endif /* MONTY_H */
+/**
+ * struct bus_s - variables -args, file, line content
+ * @arg: value
+ * @file: pointer to monty file
+ * @content: line content
+ * @lifi: flag change stack <-> queue
+ * Description: carries values through the program
+ */
+typedef struct bus_s
+{
+	char *arg;
+	FILE *file;
+	char *content;
+	int lifi;
+}  bus_t;
+extern bus_t bus;
+/**
+ * struct instruction_s - opcode and its function
+ * @opcode: the opcode
+ * @f: function to handle the opcode
+ *
+ * Description: opcode and its function
+ * for stack, queues, LIFO, FIFO ALXSE project
+ */
+typedef struct instruction_s
+{
+	char *opcode;
+	void (*f)(stack_t **stack, unsigned int line_number);
+} instruction_t;
+char *_realloc(char *ptr, unsigned int old_size, unsigned int new_size);
+ssize_t getstdin(char **lineptr, int file);
+char  *clean_line(char *content);
+void f_push(stack_t **head, unsigned int number);
+void f_pall(stack_t **head, unsigned int number);
+void f_pint(stack_t **head, unsigned int number);
+int execute(char *content, stack_t **head, unsigned int counter, FILE *file);
+void free_stack(stack_t *head);
+void f_pop(stack_t **head, unsigned int counter);
+void f_swap(stack_t **head, unsigned int counter);
+void f_add(stack_t **head, unsigned int counter);
+void f_nop(stack_t **head, unsigned int counter);
+void f_sub(stack_t **head, unsigned int counter);
+void f_div(stack_t **head, unsigned int counter);
+void f_mul(stack_t **head, unsigned int counter);
+void f_mod(stack_t **head, unsigned int counter);
+void f_pchar(stack_t **head, unsigned int counter);
+void f_pstr(stack_t **head, unsigned int counter);
+void f_rotl(stack_t **head, unsigned int counter);
+void f_rotr(stack_t **head, __attribute__((unused)) unsigned int counter);
+void addnode(stack_t **head, int n);
+void addqueue(stack_t **head, int n);
+void f_queue(stack_t **head, unsigned int counter);
+void f_stack(stack_t **head, unsigned int counter);
+#endif
